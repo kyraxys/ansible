@@ -1,0 +1,27 @@
+- hosts: equipos
+  gather_facts: yes
+  remote_user: "kyraxys"
+  vars:
+    cv_servicio: "tomcat"
+    cv_accion: "startup"
+    cv_servidor: "RYZEN2"
+    service_accion_status: ""
+  tasks:
+    - name: inicio de bloque
+      block:
+        - name: Administrar Apache2
+          include_tasks: "tasks/apache.yml"
+          register: resultado_apache2
+          ignore_errors: true
+          when: cv_servicio == 'apache2'
+        
+        - name: Administrar Tomcat
+          include_tasks: "tasks/tomcat.yml"
+          register: resultado_tomcat
+          ignore_errors: true
+          when: cv_servicio == 'tomcat'
+
+        - name: Debug resultado
+          debug:
+            msg: "{{ vars['resultado_' + cv_servicio] }}"
+

@@ -1,0 +1,62 @@
+
+- name: Debug Perform action on {{ cv_servicio }} service
+  debug:
+    msg: "ACCION:{{ cv_accion }} - SERVICIO:{{ cv_servicio }}"
+
+- name: Verificar estado actual del servicio
+  service_facts:
+  register: service_status
+  when: cv_accion in ['started', 'stopped', 'restarted']
+
+- name: Debug estado
+  debug:
+    msg: "{{service_status['ansible_facts']['services'][cv_servicio]['state']}}"
+  when: cv_accion in ['started', 'stopped', 'restarted']
+
+- name: Confirmar el estado inicial del servicio
+  fail:
+    msg: "Fallo al realizar la acción en el servicio {{ cv_servicio }}"
+  when: cv_accion in ['started', 'stopped', 'restarted'] and
+        (cv_accion == 'started' and service_status['ansible_facts']['services'][cv_servicio]['state'] == 'running') or
+        (cv_accion == 'stopped' and service_status['ansible_facts']['services'][cv_servicio]['state'] == 'stopped')
+
+- name: Realizar acción en el servicio
+  become: true
+  service:
+    name: "{{ cv_servicio }}"
+    state: "{{ cv_accion }}"
+  when: cv_accion in ['started', 'stopped', 'restarted'] and service_status['ansible_facts']['services'][cv_servicio]['state'] != cv_accion
+
+- name: Esperar unos segundos para permitir que el servicio se inicie/apague
+  pause:
+    seconds: 15
+  when: cv_accion in ['started', 'stopped', 'restarted']
+
+- name: Verificar el estado del servicio después de la acción
+  service_facts:
+  register: service_status_after
+  when: cv_accion in ['started', 'stopped', 'restarted']
+
+- name: Debug estado del servicio después de la acción
+  debug:
+    msg: "{{service_status['ansible_facts']['services'][cv_servicio]['state']}}"
+  when: cv_accion in ['started', 'stopped', 'restarted']
+
+- name: Mostrar estado final del servicio
+  debug:
+    msg: "{{ service_status_after['ansible_facts']['services'][cv_servicio]['state'] }}"
+  when: cv_accion in ['started', 'stopped', 'restarted']
+
+- name: Confirmar el estado final del servicio
+  fail:
+    msg: "Fallo al realizar la acción en el servicio {{ cv_servicio }}"
+  when: cv_accion in ['started', 'stopped', 'restarted'] and
+        (cv_accion == 'started' and service_status_after['ansible_facts']['services'][cv_servicio]['state'] != 'running') or
+        (cv_accion == 'stopped' and service_status_after['ansible_facts']['services'][cv_servicio]['state'] != 'stopped') or
+        (cv_accion == 'restarted' and service_status_after['ansible_facts']['services'][cv_servicio]['state'] != 'running')
+
+
+- name: "Notificar a CV - Fin"
+  debug:
+    msg: "{{ cv_servidor }} - {{ cv_servicio }} is {{ service_status_after['ansible_facts']['services'][cv_servicio]['state'] }}"
+  

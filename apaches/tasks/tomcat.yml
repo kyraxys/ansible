@@ -1,0 +1,85 @@
+- name: Debug cv_accion y cv_servicio
+  debug:
+    msg: "Acción: {{ cv_accion }}, Servicio: {{ cv_servicio }}"
+
+- name: Verificar estado actual del servicio
+  shell: "ps -ef | grep {{ cv_servicio }} | grep -v grep"
+  register: service_current_state
+  ignore_errors: true
+
+- name: Debug -> Verificar estado actual del servicio
+  debug:
+    msg: "{{ service_current_state.rc }}"
+
+- name: Guardar estado actual en variable running
+  set_fact:
+    current_state: "running"
+  when: service_current_state.rc == 0
+
+- name: Guardar estado actual en variable stopped
+  set_fact:
+    current_state: "stopped"
+  when: service_current_state.rc != 0
+
+- name: Guardar estado actual en variable stopped
+  debug:
+    msg: "{{ current_state }}"
+  
+
+- name: Si se pide shutdown y ya está detenido, guardar en variable que no se realizó ninguna acción
+  set_fact:
+    service_accion_status: "No se realizó ninguna acción porque el servicio ya está detenido"
+  when: cv_accion == 'shutdown' and current_state == 'stopped'
+
+- name: Si se pide startup y ya está iniciado, guardar en variable que no se realizó ninguna acción
+  set_fact:
+    service_accion_status: "No se realizó ninguna acción porque el servicio ya está iniciado"
+  when: cv_accion == 'startup' and current_state == 'running'
+
+- name: Realizar la cv_accion en el cv_servicio
+  become: true
+  command: "/app/apache-tomcat-8.5.100/bin/{{ cv_accion }}.sh"
+  register: action_result
+  when: cv_servicio == 'tomcat' and service_accion_status is defined and service_accion_status == ''
+
+- name: Debug Realizar la cv_accion en el cv_servicio
+  debug: 
+    msg: "{{ action_result }}" 
+  when: cv_servicio == 'tomcat' and service_accion_status is defined and service_accion_status == ''
+
+- name: Esperar 10 segundos
+  pause:
+    seconds: 10
+  when: action_result is defined and service_accion_status is defined and service_accion_status == ''
+
+- name: Verificar estado posterior del servicio
+  shell: "ps -ef | grep {{ cv_servicio }} | grep -v grep"
+  register: service_post_state
+  ignore_errors: true 
+  when: action_result is defined and service_accion_status is defined and service_accion_status == ''
+
+- name: Debug -> Verificar estado actual del servicio
+  debug:
+    msg: "{{ service_post_state.rc }}"
+  when: action_result is defined and service_accion_status is defined and service_accion_status == ''
+
+- name: Guardar estado posterior en variable running
+  set_fact:
+    post_state: "running"
+  when: service_post_state is defined and service_post_state.rc is defined and service_post_state.rc == 0
+
+- name: Guardar estado posterior en variable stopped
+  set_fact:
+    post_state: "stopped"
+  when: service_post_state is defined and service_post_state.rc is defined and service_post_state.rc != 0
+
+- name: Guardar en service_accion_status si se inició/apagó correctamente o si hubo algún problema
+  set_fact:
+    service_accion_status: "El servicio se {{ 'inició' if cv_accion == 'startup' and post_state == 'running' else 'apagó' }} correctamente"
+  when: action_result is defined and post_state is defined and ((cv_accion == 'startup' and post_state == 'running') or (cv_accion == 'shutdown' and post_state == 'stopped'))
+
+
+- name: Mostrar estado final del servicio
+  debug:
+    msg: "{{ service_accion_status }}"
+  when: service_accion_status is defined
