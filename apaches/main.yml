@@ -3,7 +3,7 @@
   remote_user: "kyraxys"
   vars:
     cv_servicio: "tomcat"
-    cv_accion: "startup"
+    cv_accion: "shutdown"
     cv_servidor: "RYZEN2"
     service_accion_status: ""
   tasks:

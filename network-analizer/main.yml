@@ -1,0 +1,15 @@
+- hosts: equipos
+  gather_facts: yes
+  #remote_user: "kyraxys"
+  tasks:
+    - name: inicio de bloque
+      block:
+        # - name: Network Analize Script Run
+        #   command: /app/network_analizer.sh
+        #   register: resultado_script
+        #   ignore_errors: true
+        
+        - name: Debug resultado
+          include_tasks: "tasks/network_analizer.yml"
+            
+
