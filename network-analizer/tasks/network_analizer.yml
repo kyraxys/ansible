@@ -37,7 +37,7 @@
       command: ip -s link show {{ item }}
       loop: "{{ interfaces }}"
       register: interface_stats
-      ignore_errors: yes
+      #ignore_errors: true
 
     - name: Parsear estadísticas de errores y paquetes descartados
       set_fact:
@@ -56,23 +56,6 @@
     - name: Mostrar estadísticas de interfaces
       debug:
         var: parsed_stats
-
-# - name: Mostrar estadísticas de interfaces con paquetes dropeados o mensaje de interfaz sin paquetes dropeados
-#   debug:
-#     msg: >-
-#       {% set paquetes_dropeados = (item.rx_dropped != "0" or item.tx_dropped != "0") %}
-#       {% set errores_rx_tx = (item.rx_errors != "0" or item.tx_errors != "0") %}
-
-#       {% if not paquetes_dropeados and not errores_rx_tx %}
-#       \033[1;32mInterfaz {{ item.iface }} está bien, no tiene paquetes dropeados ni errores de recepción/transmisión.\033[0m
-#       {% elif paquetes_dropeados and not errores_rx_tx %}
-#       \033[1;33mInterfaz {{ item.iface }} tiene paquetes dropeados: RX={{ item.rx_dropped }}, TX={{ item.tx_dropped }}, pero no tiene errores de recepción/transmisión.\033[0m
-#       {% elif not paquetes_dropeados and errores_rx_tx %}
-#       \033[1;33mInterfaz {{ item.iface }} no tiene paquetes dropeados, pero tiene errores de recepción/transmisión: RX={{ item.rx_errors }}, TX={{ item.tx_errors }}.\033[0m
-#       {% else %}
-#       \033[1;31mInterfaz {{ item.iface }} tiene paquetes dropeados: RX={{ item.rx_dropped }}, TX={{ item.tx_dropped }}, y errores de recepción/transmisión: RX={{ item.rx_errors }}, TX={{ item.tx_errors }}.\033[0m
-#       {% endif %}
-#   loop: "{{ parsed_stats }}"
 
 - name: Mostrar estadísticas de interfaces con paquetes dropeados o mensaje de interfaz sin paquetes dropeados
   debug:
