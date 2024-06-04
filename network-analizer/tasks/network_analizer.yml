@@ -1,9 +1,4 @@
-# - name: Verificar errores en interfaces de red
-#   hosts: all
-#   gather_facts: yes
-#   remote_user: kyraxys
-
-#   tasks:
+---
 - name: Inicializar variable errors
   set_fact:
     errors: {}
