@@ -1,0 +1,18 @@
+- hosts: equipos
+  gather_facts: yes
+  #remote_user: "kyraxys"
+  tasks:
+    - name: inicio de bloque
+      block:
+        # - name: Network Analize Script Run
+        #   command: /app/network_analizer.sh
+        #   register: resultado_script
+        #   ignore_errors: true
+        
+        - name: Run Network Analizer
+          include_tasks: "tasks/checknet.yml"
+      rescue:
+        - name: Debug error
+          debug:
+            msg: "Se ha producido un error al analizar la red en el equipo..."
+
