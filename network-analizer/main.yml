@@ -9,7 +9,10 @@
         #   register: resultado_script
         #   ignore_errors: true
         
-        - name: Debug resultado
+        - name: Run Network Analizer
           include_tasks: "tasks/network_analizer.yml"
-            
+      rescue:
+        - name: Debug error
+          debug:
+            msg: "Se ha producido un error al analizar la red en el equipo..."
 
