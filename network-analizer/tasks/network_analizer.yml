@@ -13,6 +13,8 @@
     os_family: "{{ ansible_os_family }}"
     os_version: "{{ ansible_distribution_version }}"
 
+#- fail:
+
 - name: Depurar información del sistema operativo
   debug:
     msg: "OS Family: {{ os_family }}, OS Version: {{ os_version }}, Distribution: {{ ansible_distribution }}"
