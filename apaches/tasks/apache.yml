@@ -21,7 +21,6 @@
         (cv_accion == 'stopped' and service_status['ansible_facts']['services'][cv_servicio]['state'] == 'stopped')
 
 - name: Realizar acción en el servicio
-  become: true
   service:
     name: "{{ cv_servicio }}"
     state: "{{ cv_accion }}"
@@ -29,7 +28,7 @@
 
 - name: Esperar unos segundos para permitir que el servicio se inicie/apague
   pause:
-    seconds: 15
+    seconds: 20
   when: cv_accion in ['started', 'stopped', 'restarted']
 
 - name: Verificar el estado del servicio después de la acción
@@ -39,7 +38,7 @@
 
 - name: Debug estado del servicio después de la acción
   debug:
-    msg: "{{service_status['ansible_facts']['services'][cv_servicio]['state']}}"
+    msg: "{{service_status_after['ansible_facts']['services'][cv_servicio]['state']}}"
   when: cv_accion in ['started', 'stopped', 'restarted']
 
 - name: Mostrar estado final del servicio
