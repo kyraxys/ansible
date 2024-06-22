@@ -3,14 +3,17 @@
   remote_user: "prueba"
   become_method: sudo
   become: true
-  vars:
-    cv_servicio: "apache2"
-    cv_accion: "restarted"
-    cv_servidor: "ENID"
-    service_accion_status: ""
+  # vars:
+  #   cv_servicio: "apache2"
+  #   cv_accion: "stopped"
+  #   cv_servidor: "EUGENE"
+  #   service_accion_status: ""
   tasks:
     - name: inicio de bloque
       block:
+        - name: Include vars
+          ansible.builtin.include_vars: "vars/vars.yml"
+            
         - name: Administrar Apache2
           include_tasks: "tasks/apache.yml"
           register: resultado_apache2

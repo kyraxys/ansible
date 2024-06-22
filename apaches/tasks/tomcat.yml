@@ -1,4 +1,4 @@
-- name: Debug cv_accion y cv_servicio
+- name: Debug Vars Form
   debug:
     msg: "Acción: {{ cv_accion }}, Servicio: {{ cv_servicio }}"
 
@@ -21,7 +21,7 @@
     current_state: "stopped"
   when: service_current_state.rc != 0
 
-- name: Guardar estado actual en variable stopped
+- name: Debug estado actual
   debug:
     msg: "{{ current_state }}"
   
@@ -38,7 +38,7 @@
 
 - name: Realizar la cv_accion en el cv_servicio
   become: true
-  command: "/app/apache-tomcat-8.5.100/bin/{{ cv_accion }}.sh"
+  command: "{{tomcat_path}}/bin/{{ cv_accion }}.sh"
   register: action_result
   when: cv_servicio == 'tomcat' and service_accion_status is defined and service_accion_status == ''
 
