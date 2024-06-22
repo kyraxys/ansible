@@ -3,11 +3,6 @@
   remote_user: "prueba"
   become_method: sudo
   become: true
-  # vars:
-  #   cv_servicio: "apache2"
-  #   cv_accion: "stopped"
-  #   cv_servidor: "EUGENE"
-  #   service_accion_status: ""
   tasks:
     - name: inicio de bloque
       block:
@@ -29,4 +24,8 @@
         - name: Debug resultado
           debug:
             msg: "{{ vars['resultado_' + cv_servicio] }}"
+
+        - name: "Notificar a CV - Fin"
+          debug:
+            msg: "{{ cv_servidor }} - {{ cv_servicio }} is {{ service_status_after['ansible_facts']['services'][cv_servicio]['state'] }}"
 
