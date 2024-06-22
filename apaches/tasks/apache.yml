@@ -54,8 +54,3 @@
         (cv_accion == 'stopped' and service_status_after['ansible_facts']['services'][cv_servicio]['state'] != 'stopped') or
         (cv_accion == 'restarted' and service_status_after['ansible_facts']['services'][cv_servicio]['state'] != 'running')
 
-
-- name: "Notificar a CV - Fin"
-  debug:
-    msg: "{{ cv_servidor }} - {{ cv_servicio }} is {{ service_status_after['ansible_facts']['services'][cv_servicio]['state'] }}"
-  

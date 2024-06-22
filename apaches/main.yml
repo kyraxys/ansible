@@ -21,10 +21,6 @@
           ignore_errors: true
           when: cv_servicio == 'tomcat'
 
-        - name: Debug resultado
-          debug:
-            msg: "{{ vars['resultado_' + cv_servicio] }}"
-
         - name: "Notificar a CV - Fin"
           debug:
             msg: "{{ cv_servidor }} - {{ cv_servicio }} is {{ service_status_after['ansible_facts']['services'][cv_servicio]['state'] }}"
