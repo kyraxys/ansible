@@ -1,6 +1,6 @@
 ---
 cv_servicio: "apache2"
-cv_accion: "stopped"
+cv_accion: "started"
 cv_servidor: "EUGENE"
 service_accion_status: ""
 tomcat_path: ""
